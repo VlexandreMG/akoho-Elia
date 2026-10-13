@@ -1,0 +1,14 @@
+build-file/
+
+build-file/lib/lib.zip 
+
+**/classes/
+build-file/ear/
+
+.idea/
+*.iml 
+
+__pycache__/
+.venv/
+
+.DS_Store
