@@ -74,7 +74,8 @@
     pi.getFormufle().getChamp("etatsante_0").setLibelle("&Eacute;tat de sant&eacute;");
     pi.getFormufle().getChamp("remarque_0").setLibelle("Remarque");
     pi.getFormufle().getChamp("remarque_0").setTaille(20);
-    pi.getFormufle().getChamp("miniallea_0").setLibelle("miniallea_0");
+    pi.getFormufle().getChamp("miniallea_0").setLibelle("miniallea");
+    pi.getFormufle().getChamp("miniallea_0").setTaille(40);
 
     Champ.setVisible(pi.getFormufle().getChampMulitple("idmere").getListeChamp(),false);
 //    Champ.setPageAppelComplete(pi.getFormufle().getChampFille("idbatiment"),"ferme.configuration.Batiment","id","BATIMENT","id","id");
