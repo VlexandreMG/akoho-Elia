@@ -74,6 +74,7 @@
     pi.getFormufle().getChamp("etatsante_0").setLibelle("&Eacute;tat de sant&eacute;");
     pi.getFormufle().getChamp("remarque_0").setLibelle("Remarque");
     pi.getFormufle().getChamp("remarque_0").setTaille(20);
+    pi.getFormufle().getChamp("mini-allea").setLibelle("Miniallea");
 
     Champ.setVisible(pi.getFormufle().getChampMulitple("idmere").getListeChamp(),false);
 //    Champ.setPageAppelComplete(pi.getFormufle().getChampFille("idbatiment"),"ferme.configuration.Batiment","id","BATIMENT","id","id");
@@ -81,7 +82,7 @@
 //    Champ.setPageAppelComplete(pi.getFormufle().getChampFille("idsexe"),"bean.TypeObjet","id","SEXE","id","val");
 //    Champ.setPageAppelComplete(pi.getFormufle().getChampFille("idqualite"),"ferme.configuration.QualitePoussin","id","QUALITEPOUSSIN","id","id");
 
-    String[] colOrdre = {"idparquet","capmax","idsexe","qte","etatsante","remarque"};
+    String[] colOrdre = {"idparquet","capmax","idsexe","qte","etatsante","remarque","Miniallea"};
     pi.getFormufle().setColOrdre(colOrdre);
 
     String acte = request.getParameter("acte");
