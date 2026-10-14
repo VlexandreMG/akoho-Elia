@@ -11,6 +11,7 @@ public class TriageBatimentParquetDetail extends ClassFille {
     private String idsexe;
     private String idqualite;
     private int qte;
+    private int miniallea;
 
     /**
      * Etat de sante : 10 = sain, 1..9 = malade. Aucun mort au triage.
@@ -118,6 +119,13 @@ public class TriageBatimentParquetDetail extends ClassFille {
         this.remarque = remarque;
     }
 
+    public int getMiniallea() {
+        return miniallea;
+    }
+
+    public void setMiniallea(int minall) {
+        this.miniallea = minall;
+    }
 
     @Override
     public String getNomClasseMere() {
