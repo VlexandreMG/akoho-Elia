@@ -40,7 +40,6 @@ public class PoussinJourDetail extends ClassMAPTable {
     public static final int NB_MOIS = 3;
     /** Marge amont : on simule les pontes jusqu'à 60 jours avant pour remplir le 1er mois. */
     public static final int MARGE_PONTE_JOURS = 60;
-
     private static final String[] MOIS_FR = {"", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
             "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
 
@@ -183,9 +182,10 @@ public class PoussinJourDetail extends ClassMAPTable {
         for (Lot lot : lots) {
             if (lot.getDatearrivee() == null) continue;
 
-            // Effectif de pondeuses = femelles conformes disponibles du lot.
-            double pondeuses = dispoFemelles(lot.getId(), conn);
-            if (pondeuses <= 0) continue;
+            // Effectif du lot = TOUS les akoho disponibles (mâles + femelles
+            // conformes) : le calendrier compte tout le cheptel dispo.
+            double effectif = dispoTotale(lot.getId(), conn);
+            if (effectif <= 0) continue;
 
             // Normes de la souche : via le programme du lot, sinon 1er programme de la souche.
             String idProgramme = lot.getIdprogramme();
@@ -207,7 +207,7 @@ public class PoussinJourDetail extends ClassMAPTable {
                 if (ageSemaines >= 0) {
                     ProgrammeZootechniqueDetails norme = normePourAge(normes, ageSemaines);
                     if (norme != null && norme.getPontehebdomadaire() > 0) {
-                        double oeufs = pondeuses * norme.getPontehebdomadaire() / 100.0 / 7.0;
+                        double oeufs = effectif * norme.getPontehebdomadaire() / 100.0 / 7.0;
                         double poussins = oeufs * norme.getFertilite() / 100.0
                                 * norme.getTauxeclosion() / 100.0;
                         Calendar eclosion = (Calendar) d.clone();
@@ -227,11 +227,20 @@ public class PoussinJourDetail extends ClassMAPTable {
         return cumul;
     }
 
-    /** Femelles conformes disponibles d'un lot (vue des dispos + libellés). */
-    private double dispoFemelles(String idLot, Connection conn) throws Exception {
+    /**
+     * Tous les akoho disponibles du lot : mâles conformes + femelles
+     * conformes (vue des dispos). Un lot sans dispo des deux sexes est ignoré.
+     */
+    private double dispoTotale(String idLot, Connection conn) throws Exception {
+        return dispoParSexe(idLot, ConstanteFerme.IDSEXEFEMELLE, conn)
+                + dispoParSexe(idLot, ConstanteFerme.IDSEXEMALE, conn);
+    }
+
+    /** Disponibles d'un lot pour un sexe, qualité conforme (vue des dispos + libellés). */
+    private double dispoParSexe(String idLot, String idSexe, Connection conn) throws Exception {
         TriageLotSexeQualiteLib t = new TriageLotSexeQualiteLib();
         t.setIdLot(idLot);
-        t.setIdSexe(ConstanteFerme.IDSEXEFEMELLE);
+        t.setIdSexe(idSexe);
         t.setIdQualite(ConstanteFerme.qualiteConforme);
         TriageLotSexeQualiteLib[] r =
                 (TriageLotSexeQualiteLib[]) CGenUtil.rechercher(t, null, null, conn, "");
