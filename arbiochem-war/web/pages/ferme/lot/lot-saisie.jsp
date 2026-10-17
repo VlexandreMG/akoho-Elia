@@ -13,6 +13,8 @@
 
     Lot o = new Lot();
     o.setNomTable("LOT");
+    // Sprint 2 (17/10) : afficher les nombres entiers (sinon 5 décimales par défaut)
+    o.setNombreApresVirgule(0); // champ NOMBREMORT rendu sans virgule
     PageInsert pi = new PageInsert(o, request, u);
     pi.setLien((String) session.getValue("lien"));  
     pi.setTitre("Saisie lot");
@@ -22,6 +24,8 @@
     pi.getFormu().getChamp("reference").setLibelle("R&eacute;f&eacute;rence");
     pi.getFormu().getChamp("dateeclosion").setLibelle("Date d'&eacute;closion");
     pi.getFormu().getChamp("datearrivee").setLibelle("Date d'arriv&eacute;e");
+    // Sprint 2 (17/10) : libellé du nouveau champ (colonne LOT.NOMBREMORT, entier)
+    pi.getFormu().getChamp("nombremort").setLibelle("Nombre de morts");
     pi.getFormu().getChamp("source").setLibelle("Source");
     pi.getFormu().getChamp("idferme").setLibelle("Ferme");
     pi.getFormu().getChamp("idarticle").setLibelle("Article");
@@ -45,7 +49,9 @@
     pi.getFormu().changerEnChamp(listef);
     pi.getFormu().getChamp("idCategorieLot").setLibelle("Cat&eacute;gorie du Lot");
 
-    String[] ordre = {"nomlot","reference","dateeclosion","datearrivee","source","idferme","idarticle","idorigine","idprogramme"};
+    // Sprint 2 : "nombremort" inséré après datearrivee => position d'affichage
+    // (setOrdre réordonne la liste sans filtrer : les champs absents sont ajoutés à la fin)
+    String[] ordre = {"nomlot","reference","dateeclosion","datearrivee","nombremort","source","idferme","idarticle","idorigine","idprogramme"};
     pi.getFormu().setOrdre(ordre);
  
     String acte = request.getParameter("acte");

@@ -184,8 +184,10 @@ public class PoussinJourDetail extends ClassMAPTable {
 
             // Effectif du lot = TOUS les akoho disponibles (mâles + femelles
             // conformes) : le calendrier compte tout le cheptel dispo.
-            double effectif = dispoTotale(lot.getId(), conn);
-            if (effectif <= 0) continue;
+            double dispo = dispoTotale(lot.getId(), conn); // colonne vue = reçu par réception
+            // Sprint 2 : on retire les morts saisies à l'insertion du lot (LOT.NOMBREMORT)
+            double effectif = dispo - lot.getNombremort(); // cheptel vivant estimé
+            if (effectif <= 0) continue; // lot éteint (ou morts >= dispo) : ignoré
 
             // Normes de la souche : via le programme du lot, sinon 1er programme de la souche.
             String idProgramme = lot.getIdprogramme();

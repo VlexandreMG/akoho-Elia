@@ -25,6 +25,17 @@ public class Lot extends ClassEtat {
      */
     private String idbc;
 
+    /**
+     * Nombre de morts saisi à la création (ou modification) du lot.
+     * Sprint 2 (17/10/2026) : colonne LOT.NOMBREMORT NUMBER DEFAULT 0.
+     * Sert à la prévision poussins : effectif réel = disponibles - ces morts.
+     * type int => le framework APJ affiche/convertit en entier ;
+     * champ vide dans le formulaire => 0 (Utilitaire.stringToInt renvoie 0).
+     * ⚠ La colonne doit valoir UPPERCASE(nom du champ) sinon le framework
+     * ne fait pas le lien champ<->colonne (d'où NBMORT -> NOMBREMORT).
+     */
+    private int nombremort; // valeur stockée dans la colonne LOT.NOMBREMORT
+
     public String getId() {
         return id;
     }
@@ -130,6 +141,30 @@ public class Lot extends ClassEtat {
 
     public String getIdbc() {
         return idbc;
+    }
+
+    /**
+     * Lecteur du nombre de morts (appelé par le framework APJ en réflexion) :
+     * - PageInsert : alimente la valeur affichée dans le champ du formulaire ;
+     * - CGenUtil.getValeurInsert : construit la valeur de la colonne NBMORT ;
+     * - CGenUtil.rechercher : remplit ce champ depuis le SELECT sur LOT.
+     * @return nombre de morts du lot (0 si jamais saisi/vide en base)
+     */
+    public int getNombremort() {
+        // ligne 1 : renvoie l'attribut de l'objet (valeur courante)
+        return nombremort;
+    }
+
+    /**
+     * Écriture du nombre de morts (appelé aussi en réflexion par le framework) :
+     * - getObjectAvecValeur (apresTarif.jsp) : convertit le texte tapé en int
+     *   ("" ou non numérique => 0 via Utilitaire.stringToInt) puis appelle ce setter ;
+     * - CGenUtil.rechercher : écrit la colonne NBMORT lue en base dans l'objet.
+     * @param nombremort nombre de morts à enregistrer pour ce lot
+     */
+    public void setNombremort(int nombremort) {
+        // ligne 1 : stocke la valeur dans l'attribut (mappé colonne LOT.NBMORT)
+        this.nombremort = nombremort;
     }
 
     public void setIdbc(String idbc) {

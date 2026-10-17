@@ -25,6 +25,8 @@
     pc.getChampByName("reference").setLibelle("R&eacute;f&eacute;rence");
     pc.getChampByName("dateeclosion").setLibelle("Date d'&eacute;closion");
     pc.getChampByName("datearrivee").setLibelle("Date d'arriv&eacute;e");
+    // Sprint 2 (17/10) : libellé du champ nombre de morts (vient de la vue LOT_LIB.NOMBREMORT)
+    pc.getChampByName("nombremort").setLibelle("Nombre de morts");
     pc.getChampByName("source").setLibelle("Source");
     pc.getChampByName("etatLib").setLibelle("&Eacute;tat");
     pc.getChampByName("idarticle").setLibelle("Id Article");
@@ -40,7 +42,8 @@
     pc.getChampByName("etat").setVisible(false);
     pc.getChampByName("idarticle").setLien(lien+"produits/as-ingredients-arbiochem-fiche.jsp.jsp","id=");
 
-    String[] ordre = {"idarticle","id","idArticleLib","nomlot","reference","idferme","idFermeLib","idcategorielotlib","idSoucheLib","idorigine","idOrigineLib","idprogramme","idProgrammeLib","dateeclosion","datearrivee","datecloture","ageJour","ageSemaine","source","etatLib"};
+    // Sprint 2 : "nombremort" ajouté après datearrivee pour l'afficher sur la fiche
+    String[] ordre = {"idarticle","id","idArticleLib","nomlot","reference","idferme","idFermeLib","idcategorielotlib","idSoucheLib","idorigine","idOrigineLib","idprogramme","idProgrammeLib","dateeclosion","datearrivee","nombremort","datecloture","ageJour","ageSemaine","source","etatLib"};
     pc.setOrdre(ordre);
 
     String pageRetour = "ferme/lot/lot-liste.jsp";
