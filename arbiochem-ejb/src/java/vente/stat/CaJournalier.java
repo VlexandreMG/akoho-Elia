@@ -62,4 +62,5 @@ public class CaJournalier extends ClassMAPTable {
     public void setMontant(double montant) {
         this.montant = montant;
     }
+    
 }
