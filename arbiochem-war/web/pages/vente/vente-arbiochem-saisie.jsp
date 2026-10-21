@@ -158,7 +158,7 @@
                 idmagasin = (String) session.getAttribute("idMagasin");
             }
             Client c = null;
-            if(request.getParameter("idClientlibelle")!=null && request.getParameter("idClientlibelle").split(" - ").length>0){
+            if(request.getParameter("idClientlibelle")!=null && request.getParameter("idClientlibelle").contains(" - ")){
                 String idclient = request.getParameter("idClientlibelle").split(" - ")[0];
                 c = (Client)new Client().getById(idclient,"client",null);
                 Calendar cal = Calendar.getInstance();
