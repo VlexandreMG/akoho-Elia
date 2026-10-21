@@ -91,6 +91,8 @@ public class Vente extends FactureCF {
     protected VenteDetails[] venteDetails;
     @LibelleAffichage("Est pr&eacute;vu")
     int estPrevu;
+    @LibelleAffichage("Probl$egrave;me")
+    int probleme;
     @LibelleAffichage("Montant de revient")
     double montantRevient;
     @LibelleAffichage("Marge brute")
@@ -128,6 +130,14 @@ public class Vente extends FactureCF {
     @LibelleAffichage("Client")
     Client client;
     String estAppoint="non";
+
+    public int getProbleme() {
+        return probleme;
+    }
+
+    public void setProbleme(int probleme) {
+        this.probleme = probleme;
+    }
 
     public String getEstAppoint() {
         return estAppoint;
