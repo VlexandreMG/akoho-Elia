@@ -159,7 +159,7 @@
             }
             Client c = null;
             if(request.getParameter("idClientlibelle")!=null && request.getParameter("idClientlibelle").contains(" - ")){
-                String idclient = request.getParameter("idClientlibelle").split(" - ")[0];
+                String idclient = request.getParameter("idClientlibelle").split(" - ")[0].trim();
                 c = (Client)new Client().getById(idclient,"client",null);
                 Calendar cal = Calendar.getInstance();
                 if(c.getDatecarte()!=null){
