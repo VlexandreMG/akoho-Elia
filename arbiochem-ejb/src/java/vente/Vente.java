@@ -1335,34 +1335,47 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
     public static AvoirFC genererAvoir2(String u, Connection c, String idVente) throws SQLException, Exception{
         AvoirFC avoirFC = null;
         boolean estOuvert = false;
+        // Étape 1 : si on ne m'a pas donné de connexion, j'en ouvre une moi-même (avec commit manuel), sinon j'utilise celle de l'appelant
         if(c==null){
             c = new UtilDB().GetConn();
             estOuvert = true;
-            c.setAutoCommit(false);
+            c.setAutoCommit(false); 
         }
         try {
+            // Étape 2 : je lis la facture demandée par son identifiant
             Vente vente = Vente.getById(c, idVente);
+            // Étape 3 : je lis toutes les lignes de cette facture (les articles vendus)
             vente.getVenteDetailsNonGrp(c);
+            // Étape 4 : je cherche les avoirs qui existent déjà pour cette facture (résultat non utilisé aujourd'hui : ce sera l'objet de la phase 2)
             AvoirFC[] avoirs = (AvoirFC[]) CGenUtil.rechercher(new AvoirFC(), null, null, c, " and idVente = '"+idVente+"'");
             int tailleFilles = vente.venteDetails.length;
+            // Étape 5 : je construis l'en-tête de l'avoir à partir de la facture (client, magasin, date, designation, compte + lien setIdVente + état 1 « créée »)
             avoirFC = Vente.transformerFactureToAvoir(vente);
+            // Étape 6 : je donne le type d'avoir TYA0002, sans quoi la création planterait (NPE sur getIdtypeavoir)
             avoirFC.setIdtypeavoir(ConstanteSocobis.ID_TYPE_AVOIR);
+            // Étape 7 : je crée l'en-tête dans la base (numéro via vue V_NUMEROAVOIR_EN_COURS + clé générée par séquence AVRFC…)
             avoirFC.createObject(u, c);
             AvoirFCFille[] avoirFCFilles = new AvoirFCFille[tailleFilles];
             for(int i = 0; i < tailleFilles; i++){
+                // Étape 8 : pour chaque ligne de la facture, je fabrique la ligne d'avoir correspondante (même quantité + prix unitaire net recalculé)
                 avoirFCFilles[i] = vente.transformerFactureToAvoirFille2(vente.venteDetails[i], c, avoirs);
+                // Étape 9 : j'associe chaque ligne d'avoir à l'en-tête avec setIdAvoirFC, puis je l'insère dans AVOIRFCFILLE
                 avoirFCFilles[i].setIdAvoirFC(avoirFC.getId());
                 avoirFCFilles[i].createObject(u, c);
             }
             avoirFC.setAvoirDetails(avoirFCFilles);
+            // Étape 10 : je valide tout avec commit
             c.commit();
         } catch (Exception e) {
+            // En cas d'erreur : rollback seulement si c'est moi qui ai ouvert la connexion
             if(estOuvert) c.rollback();
             throw e ;
         } finally {
+            // Je referme la connexion seulement si c'est moi qui l'ai ouverte
             if(estOuvert) c.close();
         }
         
+        // Étape 11 : je retourne l'avoir créé
         return avoirFC;
     }
 
