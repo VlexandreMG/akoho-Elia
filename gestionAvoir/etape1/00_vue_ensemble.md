@@ -90,6 +90,7 @@ Après le test, j'ai vérifié en SQL : `0` avoir pour cette vente et `PROBLEME 
 
 ## Ce qui n'est pas encore géré (pour les prochaines étapes)
 
+- ⚠ **Limite découverte après coup : les ventes validées.** `ClassEtat.updateObject` (dans `apj-core.jar`) refuse de modifier un objet dont `etat >= 11`, avec le message « Impossible de modifier un objet deja valide ». Il le fait **avant** d'appeler `updateToTableWithHisto`. Depuis l'écran de modification, une vente **validée** ne déclenchera donc jamais la création de l'avoir. Mon test fonctionnait parce qu'il appelait `updateToTableWithHisto` directement, sans passer par ce contrôle (la vente testée était à `etat = 11`). Solution envisagée : une action dédiée « Signaler un problème ». Détails : [apprentissageAPJ/lecon1/01_chemin_modification.md](../../apprentissageAPJ/lecon1/01_chemin_modification.md), étage 4.
 - **L'écran ne permet pas encore de cocher « Problème ».** Si le formulaire de modification n'envoie pas ce champ, la vente est enregistrée avec `probleme = 0` (valeur par défaut d'un `int` en Java).
 - Si une vente passe de 1 à 0, puis de nouveau à 1, un **deuxième** avoir est créé : il n'y a pas encore de vérification « un avoir existe déjà pour cette vente ».
 - Rien n'est fait quand `PROBLEME` repasse à 0 (par exemple annuler l'avoir).
