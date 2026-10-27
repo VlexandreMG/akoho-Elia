@@ -626,6 +626,8 @@ public class Vente extends FactureCF {
     @Override
     public int updateToTableWithHisto(String u, Connection c) throws Exception {
         // EXERCICE 1 : lis la vente telle qu'elle est ENCORE en base (l'équivalent du :OLD d'un trigger SQL), dans une variable nommée "ancienne". Pourquoi AVANT l'UPDATE ? -> gestionAvoir/etape1/Vente.java.md, "Ligne 628"
+        Vente ancienne = Vente.getById(c, this.getId());
+
         // EXERCICE 2 : fais faire au framework la vraie modification (historique + UPDATE) et garde son résultat dans "retour". Que se passe-t-il si tu oublies cette ligne ? -> Vente.java.md "Ligne 629" + apprentissageAPJ/lecon1, étages 5 et 6
         if (false /* EXERCICE 3 : remplace "false" par la condition "la vente vient de passer de 0 à 1", sans risque de NullPointerException et sans doublon -> Vente.java.md "Ligne 630" */) {
             // EXERCICE 4 : crée l'avoir en réutilisant la méthode qui existe déjà dans cette classe. Avec quelle connexion, et pourquoi ? -> Vente.java.md "Ligne 631"
