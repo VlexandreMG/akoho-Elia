@@ -15,6 +15,8 @@ Je fais ce « trigger » dans la **couche métier Java** (la classe `vente.Vente
 
 Aucun autre fichier n'a été modifié : pas de JSP, pas de SQL, pas de trigger en base.
 
+> 🧩 **Mode exercice :** ces lignes ont été retirées de `Vente.java` et remplacées par des consignes `// EXERCICE n`. Voir [01_exercice.md](01_exercice.md).
+
 ## Ce que j'ai analysé avant d'écrire le code (et pourquoi)
 
 ### 1. Où « accrocher » mon trigger métier ?
