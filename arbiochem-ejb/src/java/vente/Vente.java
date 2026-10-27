@@ -622,6 +622,17 @@ public class Vente extends FactureCF {
 
     }
 
+    // Trigger métier : quand une vente passe de PROBLEME = 0 à PROBLEME = 1, je génère son avoir
+    @Override
+    public int updateToTableWithHisto(String u, Connection c) throws Exception {
+        Vente ancienne = Vente.getById(c, this.getId());
+        int retour = super.updateToTableWithHisto(u, c);
+        if (this.getProbleme() == 1 && ancienne != null && ancienne.getProbleme() != 1) {
+            Vente.genererAvoir2(u, c, this.getId());
+        }
+        return retour;
+    }
+
     public void createMvtCaisses(String u, Connection c) throws Exception {
         VenteDetailsCpl vdc = new VenteDetailsCpl();
         vdc.setIdVente(this.getId());
@@ -1364,8 +1375,8 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
                 avoirFCFilles[i].createObject(u, c);
             }
             avoirFC.setAvoirDetails(avoirFCFilles);
-            // Étape 10 : je valide tout avec commit
-            c.commit();
+            // Étape 10 : je valide tout avec commit, seulement si c'est moi qui ai ouvert la connexion
+            if(estOuvert) c.commit();
         } catch (Exception e) {
             // En cas d'erreur : rollback seulement si c'est moi qui ai ouvert la connexion
             if(estOuvert) c.rollback();
