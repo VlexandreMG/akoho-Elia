@@ -1540,6 +1540,29 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
             if(estOuvert)c.close();
         }
     }
+    // Je calcule le montant d'avoir que le client de cette vente peut encore utiliser (0 s'il n'en a pas)
+    public double getMontantAvoirDisponible(Connection c) throws Exception{
+        // Étape 1 : sans client, il ne peut pas y avoir d'avoir
+        if(this.getIdClient()==null || this.getIdClient().isEmpty()) return 0;
+        boolean estOuvert = false;
+        // Étape 2 : si on ne m'a pas donné de connexion, j'en ouvre une moi-même, sinon j'utilise celle de l'appelant
+        if(c==null){
+            c = new UtilDB().GetConn();
+            estOuvert = true;
+        }
+        try {
+            // Étape 3 : je cherche les avoirs du client qui ont encore un reste à utiliser
+            AvoirFCLib t = new AvoirFCLib();
+            t.setNomTable("AVOIRFCLIB_CPL");
+            AvoirFCLib[] avoirs = (AvoirFCLib[]) CGenUtil.rechercher(t,null,null,c," AND idClient='"+this.getIdClient()+"' and resteapayerar > 0");
+            // Étape 4 : je fais la somme de ces restes
+            return AdminGen.calculSommeDouble(avoirs,"resteapayerar");
+        } finally {
+            // Je referme la connexion seulement si c'est moi qui l'ai ouverte
+            if(estOuvert) c.close();
+        }
+    }
+
     public static LiaisonPaiement genererPaiementFactureParAvoir(String u, Connection c, String idVente) throws SQLException, Exception{
         LiaisonPaiement pFacture = null;
         boolean estOuvert = false;
