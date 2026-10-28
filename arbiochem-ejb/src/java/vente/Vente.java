@@ -1382,6 +1382,7 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
             avoirFC.setAvoirDetails(avoirFCFilles);
             // Étape 10 : je valide tout avec commit
             // EXERCICE 5 : valide la transaction... mais pas toujours ! Applique la règle d'or d'APJ -> Vente.java.md "Modification 2" + apprentissageAPJ/lecon1, étage 1
+            if (estOuvert) c.commit();
         } catch (Exception e) {
             // En cas d'erreur : rollback seulement si c'est moi qui ai ouvert la connexion
             if(estOuvert) c.rollback();
