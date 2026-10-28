@@ -1562,6 +1562,27 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
             if(estOuvert) c.close();
         }
     }
+    // Je calcule ce que le client devra encore payer pour cette vente une fois son avoir utilisé (jamais négatif)
+    public double getMontantAPayerApresAvoir(Connection c) throws Exception{
+        boolean estOuvert = false;
+        // Étape 1 : si on ne m'a pas donné de connexion, j'en ouvre une moi-même, sinon j'utilise celle de l'appelant
+        if(c==null){
+            c = new UtilDB().GetConn();
+            estOuvert = true;
+        }
+        try {
+            // Étape 2 : je relis cette vente dans la vue VENTE_CPL pour avoir son reste à payer à jour
+            VenteLib vente = (VenteLib) new VenteLib().getById(this.getId(), "", c);
+            if(vente==null) throw new Exception("La vente "+this.getId()+" n'existe pas");
+            // Étape 3 : je récupère l'avoir disponible du client avec la première méthode, sur la même connexion
+            double avoir = vente.getMontantAvoirDisponible(c);
+            // Étape 4 : je retire l'avoir du reste à payer, sans descendre en dessous de 0
+            return Math.max(0, vente.getMontantreste() - avoir);
+        } finally {
+            // Je referme la connexion seulement si c'est moi qui l'ai ouverte
+            if(estOuvert) c.close();
+        }
+    }
 
     public static LiaisonPaiement genererPaiementFactureParAvoir(String u, Connection c, String idVente) throws SQLException, Exception{
         LiaisonPaiement pFacture = null;
