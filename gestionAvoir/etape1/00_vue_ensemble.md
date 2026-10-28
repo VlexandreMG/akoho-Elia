@@ -17,6 +17,8 @@ Aucun autre fichier n'a été modifié : pas de JSP, pas de SQL, pas de trigger 
 
 > 🧩 **Mode exercice :** ces lignes ont été retirées de `Vente.java` et remplacées par des consignes `// EXERCICE n`. Voir [01_exercice.md](01_exercice.md).
 
+> 🐞 **`StackOverflowError` à l'enregistrement depuis l'écran :** le serveur exécutait un vieux `.class` (exercice 2 sans `super`). Corrigé en relançant `ant`, sans changer le code. Voir [02_correction_stackoverflow.md](02_correction_stackoverflow.md).
+
 ## Ce que j'ai analysé avant d'écrire le code (et pourquoi)
 
 ### 1. Où « accrocher » mon trigger métier ?
