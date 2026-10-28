@@ -63,6 +63,46 @@ J'ai besoin de `resteapayerar`. Cette valeur **n'existe pas** dans la table `AVO
 
 C'est la même organisation partout dans le projet : `Vente` / `VenteLib`, `AvoirFCFille` / `AvoirFCFilleLib`, `AvoirAchat` / `AvoirAchatLib`…
 
+### `AVOIRFCLIB_CPL` : que veut dire *CPL*, et comment calcule-t-elle le reste ?
+
+**CPL** veut dire, très probablement, **« complet »**. C'est une convention du projet : `VENTE_CPL`, `AVOIRFCLIB_CPL`… La vue `_CPL` reprend la vue *Lib* et lui **ajoute des calculs** qui demandent d'aller chercher d'autres tables (les paiements, les factures…).
+
+Ce calcul est fait **en SQL, dans la vue Oracle**, pas dans le `.jar`. Je l'ai lu avec `select text from user_views where view_name='AVOIRFCLIB_CPL'`.
+
+Pour chaque avoir, la vue va chercher trois montants :
+
+| montant | d'où il vient | question à laquelle il répond |
+|---|---|---|
+| **reste de la facture** | vue `VENTE_CPL_SANSAVOIR` | combien le client doit **encore** sur la vente d'origine ? |
+| **avoirs antérieurs** | les autres avoirs de **la même vente**, plus anciens | combien a déjà été remboursé sur cette vente ? |
+| **déjà utilisé** | vue `MOUVEMENTCAISSEGRPAVOIR_LP` | combien de cet avoir a déjà servi à payer d'autres achats ? |
+
+Puis elle calcule en deux temps :
+
+**1. L'excédent (`EXCEDENT_AR`) : ce que l'avoir rend vraiment au client.** L'avoir sert **d'abord** à annuler ce que le client doit encore sur la vente d'origine. Seul ce qui **dépasse** devient un crédit :
+
+```
+si le client a tout payé (reste facture = 0)   → excédent = tout l'avoir
+sinon                                           → excédent = ce qui dépasse la dette
+                                                  (0 si l'avoir ne couvre même pas la dette)
+```
+
+**2. Le reste utilisable (`RESTEAPAYERAR`)** : `excédent - déjà utilisé`.
+
+**Deux exemples :**
+
+| | vente d'origine 25 800, **jamais payée** (cas réel `CLIA2625`) | vente d'origine 25 800, **payée entièrement** |
+|---|---|---|
+| avoir TTC | 25 800 | 25 800 |
+| reste de la facture | 25 800 | 0 |
+| excédent | 25 800 − 25 800 = **0** (l'avoir annule la dette) | **25 800** (tout l'avoir) |
+| déjà utilisé | 0 | 0 |
+| **`RESTEAPAYERAR`** | **0** : rien à dépenser | **25 800** : crédit utilisable |
+
+Si le client du 2e exemple utilise ensuite 10 000 pour un achat, « déjà utilisé » passe à 10 000 et `RESTEAPAYERAR` tombe à **15 800**.
+
+> **À retenir :** `RESTEAPAYERAR` = « combien ce client peut encore dépenser avec cet avoir ». Je n'ai pas à refaire ce calcul en Java : je le lis.
+
 ---
 
 ## 2. `setNomTable(...)` : dire à l'objet où il habite en base
