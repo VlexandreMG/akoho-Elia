@@ -64,7 +64,7 @@
         
         PageInsertMultiple pi = new PageInsertMultiple(mere, fille, request, nombreLigne, u);
         pi.setLien((String) session.getValue("lien"));
-        Liste[] liste = new Liste[4];
+        Liste[] liste = new Liste[5];
         Magasin m = new Magasin();
         m.setNomTable("MagasinVente");
         liste[0] = new Liste("idMagasin",m,"val","id");
@@ -95,6 +95,9 @@
                 pi.getFormu().getChamp("idMagasin").setDefaut(request.getParameter("idPoint"));
             }
         }
+
+        liste[4] = new Liste("probleme");
+        liste[4].makeListeOuiNon();
 
         pi.getFormu().changerEnChamp(liste);
         new ChampCompte("compte",pi.getFormufle());
@@ -155,8 +158,8 @@
                 idmagasin = (String) session.getAttribute("idMagasin");
             }
             Client c = null;
-            if(request.getParameter("idClientlibelle")!=null && request.getParameter("idClientlibelle").split(" - ").length>0){
-                String idclient = request.getParameter("idClientlibelle").split(" - ")[0];
+            if(request.getParameter("idClientlibelle")!=null && request.getParameter("idClientlibelle").contains(" - ")){
+                String idclient = request.getParameter("idClientlibelle").split(" - ")[0].trim();
                 c = (Client)new Client().getById(idclient,"client",null);
                 Calendar cal = Calendar.getInstance();
                 if(c.getDatecarte()!=null){

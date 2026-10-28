@@ -91,6 +91,8 @@ public class Vente extends FactureCF {
     protected VenteDetails[] venteDetails;
     @LibelleAffichage("Est pr&eacute;vu")
     int estPrevu;
+    @LibelleAffichage("Probl$egrave;me")
+    int probleme;
     @LibelleAffichage("Montant de revient")
     double montantRevient;
     @LibelleAffichage("Marge brute")
@@ -128,6 +130,14 @@ public class Vente extends FactureCF {
     @LibelleAffichage("Client")
     Client client;
     String estAppoint="non";
+
+    public int getProbleme() {
+        return probleme;
+    }
+
+    public void setProbleme(int probleme) {
+        this.probleme = probleme;
+    }
 
     public String getEstAppoint() {
         return estAppoint;
@@ -610,6 +620,22 @@ public class Vente extends FactureCF {
     public void controlerUpdate(Connection c) throws Exception {
         super.controlerUpdate(c);
 
+    }
+
+    // Trigger métier : quand une vente passe de PROBLEME = 0 à PROBLEME = 1, je génère son avoir
+    @Override
+    public int updateToTableWithHisto(String u, Connection c) throws Exception {
+        // EXERCICE 1 : lis la vente telle qu'elle est ENCORE en base (l'équivalent du :OLD d'un trigger SQL), dans une variable nommée "ancienne". Pourquoi AVANT l'UPDATE ? -> gestionAvoir/etape1/Vente.java.md, "Ligne 628"
+        Vente ancienne = Vente.getById(c, this.getId());
+
+        // EXERCICE 2 : fais faire au framework la vraie modification (historique + UPDATE) et garde son résultat dans "retour". Que se passe-t-il si tu oublies cette ligne ? -> Vente.java.md "Ligne 629" + apprentissageAPJ/lecon1, étages 5 et 6
+        int retour = super.updateToTableWithHisto(u,c);
+
+        if (this.getProbleme() == 1 && ancienne != null && ancienne.getProbleme() != 1) { /* EXERCICE 3 : remplace "false" par la condition "la vente vient de passer de 0 à 1", sans risque de NullPointerException et sans doublon -> Vente.java.md "Ligne 630" */
+            // EXERCICE 4 : crée l'avoir en réutilisant la méthode qui existe déjà dans cette classe. Avec quelle connexion, et pourquoi ? -> Vente.java.md "Ligne 631"
+            Vente.genererAvoir2(u,c,this.getId());
+        }
+        return retour;
     }
 
     public void createMvtCaisses(String u, Connection c) throws Exception {
@@ -1325,34 +1351,48 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
     public static AvoirFC genererAvoir2(String u, Connection c, String idVente) throws SQLException, Exception{
         AvoirFC avoirFC = null;
         boolean estOuvert = false;
+        // Étape 1 : si on ne m'a pas donné de connexion, j'en ouvre une moi-même (avec commit manuel), sinon j'utilise celle de l'appelant
         if(c==null){
             c = new UtilDB().GetConn();
             estOuvert = true;
-            c.setAutoCommit(false);
+            c.setAutoCommit(false); 
         }
         try {
+            // Étape 2 : je lis la facture demandée par son identifiant
             Vente vente = Vente.getById(c, idVente);
+            // Étape 3 : je lis toutes les lignes de cette facture (les articles vendus)
             vente.getVenteDetailsNonGrp(c);
+            // Étape 4 : je cherche les avoirs qui existent déjà pour cette facture (résultat non utilisé aujourd'hui : ce sera l'objet de la phase 2)
             AvoirFC[] avoirs = (AvoirFC[]) CGenUtil.rechercher(new AvoirFC(), null, null, c, " and idVente = '"+idVente+"'");
             int tailleFilles = vente.venteDetails.length;
+            // Étape 5 : je construis l'en-tête de l'avoir à partir de la facture (client, magasin, date, designation, compte + lien setIdVente + état 1 « créée »)
             avoirFC = Vente.transformerFactureToAvoir(vente);
+            // Étape 6 : je donne le type d'avoir TYA0002, sans quoi la création planterait (NPE sur getIdtypeavoir)
             avoirFC.setIdtypeavoir(ConstanteSocobis.ID_TYPE_AVOIR);
+            // Étape 7 : je crée l'en-tête dans la base (numéro via vue V_NUMEROAVOIR_EN_COURS + clé générée par séquence AVRFC…)
             avoirFC.createObject(u, c);
             AvoirFCFille[] avoirFCFilles = new AvoirFCFille[tailleFilles];
             for(int i = 0; i < tailleFilles; i++){
+                // Étape 8 : pour chaque ligne de la facture, je fabrique la ligne d'avoir correspondante (même quantité + prix unitaire net recalculé)
                 avoirFCFilles[i] = vente.transformerFactureToAvoirFille2(vente.venteDetails[i], c, avoirs);
+                // Étape 9 : j'associe chaque ligne d'avoir à l'en-tête avec setIdAvoirFC, puis je l'insère dans AVOIRFCFILLE
                 avoirFCFilles[i].setIdAvoirFC(avoirFC.getId());
                 avoirFCFilles[i].createObject(u, c);
             }
             avoirFC.setAvoirDetails(avoirFCFilles);
-            c.commit();
+            // Étape 10 : je valide tout avec commit
+            // EXERCICE 5 : valide la transaction... mais pas toujours ! Applique la règle d'or d'APJ -> Vente.java.md "Modification 2" + apprentissageAPJ/lecon1, étage 1
+            if (estOuvert) c.commit();
         } catch (Exception e) {
+            // En cas d'erreur : rollback seulement si c'est moi qui ai ouvert la connexion
             if(estOuvert) c.rollback();
             throw e ;
         } finally {
+            // Je referme la connexion seulement si c'est moi qui l'ai ouverte
             if(estOuvert) c.close();
         }
         
+        // Étape 11 : je retourne l'avoir créé
         return avoirFC;
     }
 
@@ -1500,6 +1540,29 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
             if(estOuvert)c.close();
         }
     }
+    // Je calcule le montant d'avoir que le client de cette vente peut encore utiliser (0 s'il n'en a pas)
+    public double getMontantAvoirDisponible(Connection c) throws Exception{
+        // Étape 1 : sans client, il ne peut pas y avoir d'avoir
+        if(this.getIdClient()==null || this.getIdClient().isEmpty()) return 0;
+        boolean estOuvert = false;
+        // Étape 2 : si on ne m'a pas donné de connexion, j'en ouvre une moi-même, sinon j'utilise celle de l'appelant
+        if(c==null){
+            c = new UtilDB().GetConn();
+            estOuvert = true;
+        }
+        try {
+            // Étape 3 : je cherche les avoirs du client qui ont encore un reste à utiliser
+            AvoirFCLib t = new AvoirFCLib();
+            t.setNomTable("AVOIRFCLIB_CPL");
+            AvoirFCLib[] avoirs = (AvoirFCLib[]) CGenUtil.rechercher(t,null,null,c," AND idClient='"+this.getIdClient()+"' and resteapayerar > 0");
+            // Étape 4 : je fais la somme de ces restes
+            return AdminGen.calculSommeDouble(avoirs,"resteapayerar");
+        } finally {
+            // Je referme la connexion seulement si c'est moi qui l'ai ouverte
+            if(estOuvert) c.close();
+        }
+    }
+
     public static LiaisonPaiement genererPaiementFactureParAvoir(String u, Connection c, String idVente) throws SQLException, Exception{
         LiaisonPaiement pFacture = null;
         boolean estOuvert = false;

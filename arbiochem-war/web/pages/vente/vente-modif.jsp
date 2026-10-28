@@ -25,11 +25,14 @@
         UpdateVenteDetails[] filles = (UpdateVenteDetails[])CGenUtil.rechercher(fille,null,null, " and idVente ='"+request.getParameter("id")+"'");
         PageUpdateMultiple pi = new PageUpdateMultiple(mere, fille, filles, request, u,filles.length);
         pi.setLien((String) session.getValue("lien"));
-        Liste[] liste = new Liste[3];
+        Liste[] liste = new Liste[4];
         liste[0] = new Liste("idDevise",new caisse.Devise(),"val","id");
         liste[1] = new Liste("idMagasin",new magasin.Magasin(),"val","id");
         liste[2] = new Liste("estPrevu");
         liste[2].makeListeOuiNon();
+
+        liste[3] = new Liste("probleme");
+        liste[3].makeListeOuiNon();
         pi.getFormu().changerEnChamp(liste);
         pi.getFormu().getChamp("etat").setVisible(false);
         pi.getFormu().getChamp("idOrigine").setVisible(false);
