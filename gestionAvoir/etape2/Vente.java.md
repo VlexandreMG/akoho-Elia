@@ -313,6 +313,8 @@ Dans la vue d'ensemble, j'avais noté `max(0, montant TTC - avoir)`. En écrivan
 Pour une vente que personne n'a encore payée, les deux sont égaux. La différence n'apparaît que si un paiement partiel existe déjà.
 
 > 📚 Le cast `(VenteLib)`, l'héritage et `Math.max` sont expliqués en détail dans [apprentissageAPJ/lecon3/01_cast_heritage_math_max.md](../../apprentissageAPJ/lecon3/01_cast_heritage_math_max.md).
+>
+> 📚 Ce qu'est `getMontantreste()` et comment Oracle le calcule (y compris quand il est **négatif**) : [apprentissageAPJ/lecon3/02_getMontantreste.md](../../apprentissageAPJ/lecon3/02_getMontantreste.md).
 
 ---
 

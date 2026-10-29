@@ -60,6 +60,8 @@ Aucun écran (JSP), aucune table et aucune vue n'ont été modifiés.
 > 📚 Pour comprendre `AvoirFC` / `AvoirFCLib`, `setNomTable`, `CGenUtil` et `AdminGen` utilisés dans ces méthodes : [apprentissageAPJ/lecon2/01_lire_en_base.md](../../apprentissageAPJ/lecon2/01_lire_en_base.md).
 >
 > 📚 Pour comprendre le cast `(VenteLib)`, l'héritage `VenteLib extends Vente` et `Math.max` utilisés dans `getMontantAPayerApresAvoir` : [apprentissageAPJ/lecon3/01_cast_heritage_math_max.md](../../apprentissageAPJ/lecon3/01_cast_heritage_math_max.md).
+>
+> 📚 Pour comprendre `getMontantreste()` (la formule de la vue `VENTE_CPL`) : [apprentissageAPJ/lecon3/02_getMontantreste.md](../../apprentissageAPJ/lecon3/02_getMontantreste.md).
 
 ## Les décisions que j'ai prises (et pourquoi)
 
