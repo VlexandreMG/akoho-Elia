@@ -1307,11 +1307,41 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
         }        
     }
 
+    // J'annule une vente en créant puis en validant son avoir, dans une seule transaction et une seule fois par vente
     public static void annulerFacture(String u, Connection c, String idVente) throws SQLException, Exception{
-        AvoirFC avoirFC = genererAvoir2(u, c, idVente);
+        boolean estOuvert = false;
+        // Étape 1 : si on ne m'a pas donné de connexion, j'ouvre MA transaction, sinon j'utilise celle de l'appelant
+        if(c==null){
+            c = new UtilDB().GetConn();
+            estOuvert = true;
+            c.setAutoCommit(false);
+        }
+        try {
+            // Étape 2 : je refuse d'annuler une vente qui a déjà un avoir (double clic, ou avoir déjà créé par le trigger)
+            if(Vente.aDejaUnAvoir(c, idVente)) throw new Exception("La vente "+idVente+" a deja un avoir : elle ne peut pas etre annulee une deuxieme fois");
+            // Étape 3 : je crée l'avoir dans MA transaction (genererAvoir2 ne fait donc pas de commit)
+            AvoirFC avoirFC = genererAvoir2(u, c, idVente);
+            // Étape 4 : je donne les lignes à l'avoir là où validerObject les cherche (getFille), sinon NullPointerException
+            avoirFC.setFille(avoirFC.getAvoirDetails());
+            // Étape 5 : je valide l'avoir dans la même transaction
+            avoirFC.validerObject(u, c);
+            // Étape 6 : tout s'est bien passé : je valide la création ET la validation ensemble
+            if(estOuvert) c.commit();
+            System.out.println("avoir généré");
+        } catch (Exception e) {
+            // En cas d'erreur : j'annule tout, l'avoir ne reste pas en base
+            if(estOuvert) c.rollback();
+            throw e;
+        } finally {
+            // Je referme la connexion seulement si c'est moi qui l'ai ouverte
+            if(estOuvert) c.close();
+        }
+    }
 
-        avoirFC.validerObject(u, c);
-        System.out.println("avoir généré");
+    // Je dis si la vente a déjà au moins un avoir non annulé
+    public static boolean aDejaUnAvoir(Connection c, String idVente) throws Exception{
+        AvoirFC[] avoirs = (AvoirFC[]) CGenUtil.rechercher(new AvoirFC(), null, null, c, " and idVente='"+idVente+"' and etat <> 0");
+        return avoirs.length > 0;
     }
     
     public static AvoirFC genererAvoir(String u, Connection c, String idVente) throws SQLException, Exception{
