@@ -634,6 +634,7 @@ public class Vente extends FactureCF {
         if (this.getProbleme() == 1 && ancienne != null && ancienne.getProbleme() != 1) { /* EXERCICE 3 : remplace "false" par la condition "la vente vient de passer de 0 à 1", sans risque de NullPointerException et sans doublon -> Vente.java.md "Ligne 630" */
             if(Vente.aDejaUnAvoir(c,this.getId())) {
                 System.out.println("Tena tsy mety");
+                throw new Exception("Cette vente a déja un avoir");
             }            // EXERCICE 4 : crée l'avoir en réutilisant la méthode qui existe déjà dans cette classe. Avec quelle connexion, et pourquoi ? -> Vente.java.md "Ligne 631"
             Vente.genererAvoir2(u,c,this.getId());
         }
