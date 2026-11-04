@@ -625,6 +625,7 @@ public class Vente extends FactureCF {
     // Trigger métier : quand une vente passe de PROBLEME = 0 à PROBLEME = 1, je génère son avoir
     @Override
     public int updateToTableWithHisto(String u, Connection c) throws Exception {
+        int count;
         // EXERCICE 1 : lis la vente telle qu'elle est ENCORE en base (l'équivalent du :OLD d'un trigger SQL), dans une variable nommée "ancienne". Pourquoi AVANT l'UPDATE ? -> gestionAvoir/etape1/Vente.java.md, "Ligne 628"
         Vente ancienne = Vente.getById(c, this.getId());
 
@@ -632,6 +633,11 @@ public class Vente extends FactureCF {
         int retour = super.updateToTableWithHisto(u,c);
 
         if (this.getProbleme() == 1 && ancienne != null && ancienne.getProbleme() != 1) { /* EXERCICE 3 : remplace "false" par la condition "la vente vient de passer de 0 à 1", sans risque de NullPointerException et sans doublon -> Vente.java.md "Ligne 630" */
+            count+=1;
+            if (count == 2) {
+                System.out.println("Cette vente a déja un avoir");
+                return 0;
+            }
             // EXERCICE 4 : crée l'avoir en réutilisant la méthode qui existe déjà dans cette classe. Avec quelle connexion, et pourquoi ? -> Vente.java.md "Ligne 631"
             Vente.genererAvoir2(u,c,this.getId());
         }
