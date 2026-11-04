@@ -128,7 +128,7 @@ Elle renvoie la somme TTC, en ariary, des avoirs non annulés de cette vente.
 
 | Défi | Début | Fin | Temps utilisé | Indices | Terminé ? | Bilan de Claude |
 |---|---|---|---|---|---|---|
-| 1 | | | | | | |
+| 1 | | | | solution expliquée sans code | oui | Réussi avec aide. Doublon bloqué et tests validés. À revoir : effet de l'exception sur la transaction. |
 | 2 | | | | | | |
 | 3 | | | | | | |
 | 4 | | | | | | |
