@@ -1609,8 +1609,8 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
         try {
             AvoirFCLib t = new AvoirFCLib();
             t.setNomTable("AVOIRFCLIB_CPL");
-            AvoirFCLib[] avoirs = (AvoirFCLib[]) CGenUtil.rechercher(t,null,null,c,"AND idClient='"+this.getIdClient()+"' and SUM(MONTANTTTCAR) as valiny");
-            return AdminGen.calculSommeDouble(avoirs,"valiny");
+            AvoirFCLib[] avoirs = (AvoirFCLib[]) CGenUtil.rechercher(t,null,null,c,"AND idVente='"+this.getId()+"' and etat <> 0");
+            return AdminGen.calculSommeDouble(avoirs,"montantTTCAr");
         } finally {
             if(estOuvert) c.close();
         }
