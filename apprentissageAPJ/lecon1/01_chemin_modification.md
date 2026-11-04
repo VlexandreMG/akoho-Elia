@@ -2,6 +2,8 @@
 
 > Objectif : comprendre ce qui se passe, étage par étage, entre le clic sur « Modifier » dans un écran et la requête `UPDATE` envoyée à Oracle. En particulier `updateObjectMultiple(mere, colonneMere, filles, c)` et `updateToTableWithHisto(u, c)`.
 
+> Pour comprendre la page qui reçoit le formulaire avant ces étages : [leçon 4, `apresMultiple.jsp`](../lecon4/01_apresMultiple.md).
+
 ## Comment j'ai obtenu ces informations
 
 - Les 3 premiers étages sont dans le code du projet. Je les ai lus directement :

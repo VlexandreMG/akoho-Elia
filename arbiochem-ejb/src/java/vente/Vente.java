@@ -633,7 +633,7 @@ public class Vente extends FactureCF {
         int retour = super.updateToTableWithHisto(u,c);
 
         if (this.getProbleme() == 1 && ancienne != null && ancienne.getProbleme() != 1) { /* EXERCICE 3 : remplace "false" par la condition "la vente vient de passer de 0 à 1", sans risque de NullPointerException et sans doublon -> Vente.java.md "Ligne 630" */
-            count+=1;
+            count +=1;
             if (count == 2) {
                 System.out.println("Cette vente a déja un avoir");
                 return 0;
