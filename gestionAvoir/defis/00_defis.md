@@ -129,7 +129,7 @@ Elle renvoie la somme TTC, en ariary, des avoirs non annulés de cette vente.
 | Défi | Début | Fin | Temps utilisé | Indices | Terminé ? | Bilan de Claude |
 |---|---|---|---|---|---|---|
 | 1 | | | | solution expliquée sans code | oui | Réussi avec aide. Doublon bloqué et tests validés. À revoir : effet de l'exception sur la transaction. |
-| 2 | | | | | | |
+| 2 | | | | | à reprendre | Structure de connexion correcte. À revoir : rôle de `apresWhere`, nom d'attribut pour `AdminGen`, filtre par vente et état, appel depuis la JSP. |
 | 3 | | | | | | |
 | 4 | | | | | | |
 | 5 | | | | | | |
