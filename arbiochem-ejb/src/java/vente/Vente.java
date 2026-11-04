@@ -1595,6 +1595,26 @@ protected EncaissementDetails [] generateDetailsEncaissements (Connection c ) th
             if(estOuvert) c.close();
         }
     }
+
+    // Allea 
+    public double getMontantTotalTTC(Connection c) throws Exception{
+        if(this.getIdClient()==null || this.getIdClient().isEmpty()) return 0;
+        boolean estOuvert = false;
+        // Étape 2 : si on ne m'a pas donné de connexion, j'en ouvre une moi-même, sinon j'utilise celle de l'appelant
+        if(c==null){
+            c = new UtilDB().GetConn();
+            estOuvert = true;
+        }
+
+        try {
+            AvoirFCLib t = new AvoirFCLib();
+            t.setNomTable("AVOIRFCLIB_CPL");
+            AvoirFCLib[] avoirs = (AvoirFCLib[]) CGenUtil.rechercher(t,null,null,c,"AND idClient='"+this.getIdClient()+"' and SUM(MONTANTTTCAR) as valiny");
+            return AdminGen.calculSommeDouble(avoirs,"valiny");
+        } finally {
+            if(estOuvert) c.close();
+        }
+    }
     // Je calcule ce que le client devra encore payer pour cette vente une fois son avoir utilisé (jamais négatif)
     public double getMontantAPayerApresAvoir(Connection c) throws Exception{
         boolean estOuvert = false;
