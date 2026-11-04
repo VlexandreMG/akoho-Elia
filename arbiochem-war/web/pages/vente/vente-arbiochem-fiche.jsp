@@ -194,7 +194,7 @@
                                         onclick="openPreview(this.dataset.url, this.dataset.kind, this.dataset.name, this.dataset.dl)"
                                         style="margin-right: 10px; margin-bottom: 10px">Imprimer
                                 </button>
-                                <p> Montant total de vente <%= dp.getMontantTotalTTC() %>  </p>
+                                <p> Montant total de vente <%= dp.getMontantTotalTTC(null) %>  </p>
                                 <%
                                     String pdfBase2 = request.getContextPath() + "/ExportPDFARBIOCHEM?action=fiche_vente_nouveau&type=duplicata&id=" + URLEncoder.encode(id, "UTF-8");
                                     String pdfApercu2 = pdfBase2 + "&inline=1";
